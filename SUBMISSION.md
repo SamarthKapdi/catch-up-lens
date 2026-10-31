@@ -10,5 +10,5 @@ Catch-Up Lens is an AI-powered second-screen artifact that welcomes fans back in
 
 ## AI Tools Used
 
-- **Google Antigravity** (Gemini 3.5 Flash agent) — Used for pair-programming, architecture design, code generation, component design, test authoring, browser verification, and end-to-end build automation.
-- **Google Gemini 2.5 Flash API** — Powers the server-side `/api/catchup` endpoint for generating natural-language match summaries from structured data, with a deterministic template-based fallback ensuring 100% uptime without an API key.
+- **Google Antigravity** — Used for pair-programming, architecture design, code generation, component design, test authoring, browser verification, and end-to-end build automation.
+- **Groq API (Llama 3.3 70B Versatile)** — Powers the server-side `/api/catchup` endpoint via OpenAI-compatible REST endpoint for sub-second generation of natural-language match summaries from structured data, with a deterministic template-based fallback ensuring 100% uptime without an API key.

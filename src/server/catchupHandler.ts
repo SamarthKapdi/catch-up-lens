@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateDeterministicSummary, trimToMaxWords } from '../engine/fallbackSummarizer';
 import { BallEvent, CatchUpSummary, SummaryTone } from '../engine/types';
 
@@ -20,8 +19,8 @@ export async function processCatchUpRequest(
   envKey?: string,
   envModel?: string
 ): Promise<CatchUpSummary> {
-  const apiKey = envKey || process.env.GEMINI_API_KEY;
-  const modelName = envModel || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const apiKey = envKey !== undefined ? envKey : process.env.GROQ_API_KEY;
+  const modelName = envModel || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
   // If no API key is set, immediately return deterministic fallback
   if (!apiKey || apiKey.trim() === '') {
@@ -33,15 +32,6 @@ export async function processCatchUpRequest(
   const timeoutId = setTimeout(() => controller.abort(), 6000);
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: modelName,
-      generationConfig: {
-        temperature: 0.2,
-        responseMimeType: 'application/json',
-      },
-    });
-
     const ballsMissed = body.missedEvents.length;
     const runsMissed = body.missedEvents.reduce((acc, b) => acc + b.runsScored, 0);
     const wicketsMissed = body.missedEvents
@@ -51,41 +41,77 @@ export async function processCatchUpRequest(
       .filter((b) => b.isBoundary)
       .map((b) => `${b.isSix ? '6' : '4'} by ${b.strikerName} (over ${b.overIndex}.${b.ballInOver})`);
 
-    const prompt = `You are Catch-Up Lens, an expert live cricket assistant for Dream11.
+    const systemPrompt = `You are Catch-Up Lens, an expert live cricket assistant for Dream11 second-screen experience.
 A fan just returned to the match after missing ${ballsMissed} balls.
-Provide a clear, engaging catch-up summary based STRICTLY on the facts provided below.
-DO NOT invent any players, events, scores, or facts. Use only what is given.
+Provide a clear, engaging catch-up summary based STRICTLY on the facts provided by the user.
 
-MATCH DATA:
-- Batting team chasing target: ${body.target}
-- Current score: ${body.currentRuns}/${body.currentWickets} in ${Math.floor(body.ballsBowled / 6)}.${body.ballsBowled % 6} overs (${120 - body.ballsBowled} balls remaining)
-- Current striker: ${body.strikerName}
-- Current bowler: ${body.bowlerName}
-- Win Probability before fan stepped away: ${body.winProbBefore}%
-- Win Probability now: ${body.winProbAfter}%
-- Deliveries missed: ${ballsMissed} balls
-- Runs scored in missed period: ${runsMissed}
-- Wickets lost in missed period: ${wicketsMissed.length > 0 ? wicketsMissed.join(', ') : 'None'}
-- Key boundaries: ${boundaries.length > 0 ? boundaries.join(', ') : 'None'}
-- Requested tone: ${body.tone} (Options: simple = plain everyday English, nerd = tactical cricket metrics and equity, hinglish = passionate cricket fan Hinglish banter)
+CRITICAL RULES:
+1. Rely ONLY on the provided match facts. Never invent players, events, runs, wickets, or scores.
+2. Return a valid JSON object with exactly these four keys:
+   - "headline": punchy 1-line headline (under 12 words)
+   - "happened": what happened in plain language (STRICTLY AT MOST 45 WORDS)
+   - "whyItMatters": how the win chances changed from ${body.winProbBefore}% to ${body.winProbAfter}% and what the current match equation is
+   - "watchNext": one key battle or tactical matchup to watch in the immediate next over
+3. Strictly follow the requested tone:
+   - "simple": Plain, clear everyday language for casual fans.
+   - "nerd": Tactical cricket analysis referencing win equity, RRR, run rates, and phase leverage.
+   - "hinglish": Passionate Indian cricket fan Hinglish banter (e.g. 'Double Jhatka!', 'chauke-chhakke', 'match fas gaya').
+4. Output raw JSON only. Do not wrap in markdown or backticks.`;
 
-REQUIREMENTS:
-1. Output MUST be valid JSON with keys:
-   "headline": punchy 1-line headline (under 12 words)
-   "happened": what happened in plain language (STRICTLY AT MOST 45 WORDS)
-   "whyItMatters": how the win chances swung from ${body.winProbBefore}% to ${body.winProbAfter}% and what the match equation is now
-   "watchNext": one specific battle to watch in the immediate next over
-2. Do not include markdown code fences or backticks. Return raw JSON only.`;
+    const userPayload = JSON.stringify(
+      {
+        target: body.target,
+        currentScore: `${body.currentRuns}/${body.currentWickets} in ${Math.floor(body.ballsBowled / 6)}.${body.ballsBowled % 6} overs (${120 - body.ballsBowled} balls remaining)`,
+        currentStriker: body.strikerName,
+        currentBowler: body.bowlerName,
+        winProbabilityBefore: `${body.winProbBefore}%`,
+        winProbabilityNow: `${body.winProbAfter}%`,
+        deliveriesMissed: ballsMissed,
+        runsScoredInMissedPeriod: runsMissed,
+        wicketsLostInMissedPeriod: wicketsMissed.length > 0 ? wicketsMissed : 'None',
+        boundariesInMissedPeriod: boundaries.length > 0 ? boundaries : 'None',
+        requestedTone: body.tone,
+      },
+      null,
+      2
+    );
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPayload },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.6,
+        max_tokens: 400,
+      }),
+      signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
 
-    const responseText = result.response.text();
-    // Clean potential code fences
-    const cleaned = responseText
+    if (!response.ok) {
+      console.warn(`Groq API returned HTTP error ${response.status}. Using fallback.`);
+      return generateDeterministicSummary(body);
+    }
+
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content;
+
+    if (!content) {
+      console.warn('Groq API response missing content. Using fallback.');
+      return generateDeterministicSummary(body);
+    }
+
+    // Sanitize response: strip potential code fences
+    const cleaned = content
       .replace(/^```json\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/\s*```$/i, '')
@@ -93,7 +119,12 @@ REQUIREMENTS:
 
     const parsed = JSON.parse(cleaned);
 
-    if (parsed.headline && parsed.happened && parsed.whyItMatters && parsed.watchNext) {
+    if (
+      typeof parsed.headline === 'string' &&
+      typeof parsed.happened === 'string' &&
+      typeof parsed.whyItMatters === 'string' &&
+      typeof parsed.watchNext === 'string'
+    ) {
       return {
         headline: parsed.headline.trim(),
         happened: trimToMaxWords(parsed.happened.trim(), 45),
@@ -110,11 +141,11 @@ REQUIREMENTS:
       };
     }
 
-    // If json fields missing, fall back safely
+    console.warn('Groq API JSON missing expected schema fields. Using fallback.');
     return generateDeterministicSummary(body);
   } catch (err) {
     clearTimeout(timeoutId);
-    console.warn('Catch-Up Gemini API call bypassed or timed out, using deterministic fallback.', err);
+    console.warn('Catch-Up Groq API call failed or timed out, using deterministic fallback.', err);
     return generateDeterministicSummary(body);
   }
 }

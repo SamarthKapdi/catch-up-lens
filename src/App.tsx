@@ -104,7 +104,7 @@ export const App: React.FC = () => {
             <span>Never watch alone.</span>
           </div>
           <div className="text-[11px] text-slate-500">
-            Dream11 Forward Deployed Engineer Intern Assignment • Built with Gemini AI & Pure TypeScript
+            Dream11 Forward Deployed Engineer Intern Assignment • Built with Groq (Llama 3.3 70B) & Pure TypeScript
           </div>
         </div>
       </footer>

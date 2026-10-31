@@ -29,7 +29,7 @@ Catch-Up Lens is a mobile-first, desktop-ready second-screen companion for live 
 
 4. **Highlight Rail** — Auto-generated moment cards for sixes, fours, wickets, dropped catches, and milestones.
 
-5. **AI-Powered Summaries** — Server-side Gemini API call with deterministic template-based fallback. Works perfectly with no API key.
+5. **AI-Powered Summaries** — Server-side Groq API call (`llama-3.3-70b-versatile`) with plain fetch and deterministic template-based fallback. Works perfectly with no API key.
 
 ---
 
@@ -55,15 +55,15 @@ flowchart TD
 
     subgraph API ["Serverless API"]
         EP["/api/catchup\n(POST)"]
-        GEM["Gemini 2.5 Flash\n(Structured JSON)"]
+        GROQ["Groq API: Llama 3.3 70B\n(Structured JSON via plain fetch)"]
     end
 
     Client -->|Zustand stores| Engine
     AW -->|visibilitychange + 20s idle| CS
     CS -->|fetch /api/catchup| EP
-    EP -->|Facts-only prompt| GEM
-    EP -.->|6s timeout or no key| FB
-    GEM -->|JSON: headline, happened,\nwhyItMatters, watchNext| CS
+    EP -->|Facts-only prompt| GROQ
+    EP -.->|6s timeout, 429 or no key| FB
+    GROQ -->|JSON: headline, happened,\nwhyItMatters, watchNext| CS
 ```
 
 ---
@@ -72,10 +72,11 @@ flowchart TD
 
 ### How the AI works
 
-The `/api/catchup` endpoint receives structured match data (score, missed events, win probability before/after, current batters, bowler, tone preference) and constructs a facts-only prompt for the Gemini API. The model is instructed to:
+The `/api/catchup` endpoint receives structured match data (score, missed events, win probability before/after, current batters, bowler, tone preference) and calls Groq's OpenAI-compatible endpoint (`https://api.groq.com/openai/v1/chat/completions`) using plain `fetch` (no heavy SDK). The model (`llama-3.3-70b-versatile`) is instructed to:
 - Use ONLY the provided match facts — never invent players or events
 - Return strict JSON: `{headline, happened, whyItMatters, watchNext}`
 - Keep "happened" to ≤ 45 words
+- Follow the requested tone (Simple, Cricket Nerd, or Hinglish)
 
 The response is sanitized (code fences stripped, word limits enforced, JSON validated).
 
@@ -83,13 +84,14 @@ The response is sanitized (code fences stripped, word limits enforced, JSON vali
 
 | Scenario | What happens |
 |---|---|
-| No `GEMINI_API_KEY` set | Instant deterministic summary from template engine |
-| API call takes > 6 seconds | Timeout → fallback |
+| No `GROQ_API_KEY` set | Instant deterministic summary from template engine |
+| API call takes > 6 seconds | Timeout (AbortController) → fallback |
+| HTTP error (e.g. 429 rate limit) | Graceful fallback |
 | API returns invalid JSON | Fallback |
 | Network error | Fallback |
 | Any exception | Fallback |
 
-The fallback summarizer uses the same match data to produce tone-aware summaries (Simple, Cricket Nerd, Hinglish) with correct statistics. A small badge shows **"Gemini AI"** or **"Instant Engine"** so the user knows the source.
+The fallback summarizer uses the same match data to produce tone-aware summaries (Simple, Cricket Nerd, Hinglish) with correct statistics. A badge shows **"Groq AI ⚡"** or **"Instant Engine"** so the user knows the source.
 
 ---
 
@@ -102,8 +104,8 @@ The fallback summarizer uses the same match data to produce tone-aware summaries
 | State | Zustand 5 |
 | Icons | Lucide React |
 | Celebrations | canvas-confetti |
-| AI | Google Gemini 2.5 Flash (via `@google/generative-ai`) |
-| Testing | Vitest 3 (11 unit tests) |
+| AI | Groq API (`llama-3.3-70b-versatile`) via plain `fetch` |
+| Testing | Vitest 3 (13+ unit tests) |
 | Deployment | Vercel (serverless functions) |
 
 **Bundle size**: ~109 KB gzipped JS, ~6 KB gzipped CSS.
@@ -122,7 +124,7 @@ npm install
 
 # 3. Set up environment (optional — app works without API key)
 cp .env.example .env
-# Edit .env to add your GEMINI_API_KEY if you have one
+# Edit .env to add your GROQ_API_KEY if you have one
 
 # 4. Run the dev server
 npm run dev
@@ -170,7 +172,7 @@ npm test
 │   │   └── __tests__/
 │   │       └── engine.test.ts  # 9 unit tests
 │   ├── server/
-│   │   ├── catchupHandler.ts   # Gemini API integration + fallback
+│   │   ├── catchupHandler.ts   # Groq API integration (Llama 3.3 70B) + fallback
 │   │   └── __tests__/
 │   │       └── catchup.test.ts # 2 unit tests
 │   ├── store/

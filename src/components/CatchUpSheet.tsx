@@ -106,9 +106,9 @@ export const CatchUpSheet: React.FC = () => {
             <div className="flex items-center space-x-2">
               {/* AI vs Instant Badge */}
               {summary?.source === 'ai' ? (
-                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-purple-500/20 to-coral-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold shadow-sm">
-                  <Sparkles className="w-3 h-3 text-purple-400" />
-                  <span>Gemini AI</span>
+                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-coral-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold shadow-sm">
+                  <Zap className="w-3 h-3 text-amber-400" />
+                  <span>Groq AI ⚡</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-surge-500/20 border border-surge-500/30 text-surge-300 text-xs font-bold shadow-sm">
