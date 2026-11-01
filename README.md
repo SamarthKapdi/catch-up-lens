@@ -2,7 +2,7 @@
 
 > **"Never watch alone."** — AI-powered second-screen artifact that gets split-attention fans back into a live cricket match in 20 seconds.
 
-Built for the **Dream11 Forward Deployed Engineer Intern** hiring assignment.
+Repository: **[https://github.com/SamarthKapdi/matchday-catchup-lens](https://github.com/SamarthKapdi/matchday-catchup-lens)**
 
 ---
 
@@ -116,8 +116,8 @@ The fallback summarizer uses the same match data to produce tone-aware summaries
 
 ```bash
 # 1. Clone the repo
-git clone <repo-url>
-cd catch-up-lens
+git clone https://github.com/SamarthKapdi/matchday-catchup-lens.git
+cd matchday-catchup-lens
 
 # 2. Install dependencies
 npm install
@@ -174,7 +174,7 @@ npm test
 │   ├── server/
 │   │   ├── catchupHandler.ts   # Groq API integration (Llama 3.3 70B) + fallback
 │   │   └── __tests__/
-│   │       └── catchup.test.ts # 2 unit tests
+│   │       └── catchup.test.ts # 7 unit tests (fetch mock suite)
 │   ├── store/
 │   │   ├── useMatchStore.ts    # Match state (Zustand)
 │   │   ├── usePredictionStore.ts # Predictions & Fan IQ
@@ -224,4 +224,4 @@ This is a **100% free-to-play, second-screen prototype**. There is **no real mon
 
 ## License
 
-Built for Dream11 Forward Deployed Engineer Intern assignment evaluation.
+MIT License. Built with Groq AI, React, Vite, and Tailwind CSS.

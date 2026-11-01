@@ -24,11 +24,11 @@ export const App: React.FC = () => {
 
       {/* Main Content Arena */}
       <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Subtle Dream11 Hiring Assignment Context Banner */}
+        {/* Live Second-Screen Context Banner */}
         <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-pitch-900/60 border border-pitch-800 text-xs text-slate-400">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-coral-400" />
-            <span className="font-semibold text-slate-300">Dream11 Second-Screen Prototype</span>
+            <span className="font-semibold text-slate-300">Live Second-Screen Experience</span>
             <span className="text-slate-500">•</span>
             <span>Catch-Up Lens: AI artifact getting fans back into the match in 20 seconds</span>
           </div>
@@ -104,7 +104,7 @@ export const App: React.FC = () => {
             <span>Never watch alone.</span>
           </div>
           <div className="text-[11px] text-slate-500">
-            Dream11 Forward Deployed Engineer Intern Assignment • Built with Groq (Llama 3.3 70B) & Pure TypeScript
+            Catch-Up Lens • Built with Groq (Llama 3.3 70B) & Pure TypeScript
           </div>
         </div>
       </footer>
