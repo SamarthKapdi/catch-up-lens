@@ -3,28 +3,126 @@
 @tailwind utilities;
 
 @layer base {
+  :root,
+  html.light {
+    /* Light mode pitch colors (RGB) */
+    --pitch-950: 241 245 249; /* Slate 100 */
+    --pitch-900: 255 255 255; /* White cards */
+    --pitch-850: 248 250 252; /* Slate 50 */
+    --pitch-800: 226 232 240; /* Slate 200 border */
+    --pitch-750: 203 213 225; /* Slate 300 */
+    --pitch-700: 203 213 225;
+    --pitch-600: 148 163 184;
+  }
+
+  html.dark {
+    /* Dark broadcast pitch colors (RGB) */
+    --pitch-950: 6 9 15;     /* #06090F */
+    --pitch-900: 11 16 27;   /* #0B101B */
+    --pitch-850: 16 23 38;   /* #101726 */
+    --pitch-800: 23 32 51;   /* #172033 */
+    --pitch-750: 30 41 59;   /* #1E293B */
+    --pitch-700: 34 46 71;   /* #222E47 */
+    --pitch-600: 51 68 102;  /* #334466 */
+  }
+
   body {
-    @apply bg-pitch-950 text-slate-100 font-sans;
+    @apply bg-pitch-950 text-slate-100 font-sans transition-colors duration-200;
   }
 }
 
-/* Custom slick dark scrollbars */
+/* =========================================================
+   Light Mode Explicit Theme Overrides
+   ========================================================= */
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+html.light .bg-pitch-950 {
+  background-color: #F1F5F9 !important;
+}
+
+html.light .bg-pitch-900 {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .bg-pitch-850 {
+  background-color: #F8FAFC !important;
+}
+
+html.light .bg-pitch-800 {
+  background-color: #F1F5F9 !important;
+}
+
+html.light .border-pitch-800,
+html.light .border-pitch-750,
+html.light .border-pitch-700 {
+  border-color: #E2E8F0 !important;
+}
+
+/* Typography contrast in Light Mode */
+html.light .text-slate-100,
+html.light .text-white {
+  color: #0F172A !important;
+}
+
+html.light .text-slate-200 {
+  color: #1E293B !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* Retain high-contrast white text for colored brand badges & buttons */
+html.light button.bg-coral-500,
+html.light button.bg-coral-500 *,
+html.light .bg-coral-500,
+html.light .bg-coral-500 *,
+html.light .bg-gradient-to-r,
+html.light .bg-gradient-to-r *,
+html.light .bg-gradient-to-br,
+html.light .bg-gradient-to-br * {
+  color: #FFFFFF !important;
+}
+
+/* Keep CST defending badge text dark */
+html.light .bg-gradient-to-br.from-surge-500,
+html.light .bg-gradient-to-br.from-surge-500 * {
+  color: #0B101B !important;
+}
+
+/* Slick scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090D14;
+  background: rgba(var(--pitch-950) / 1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: rgba(var(--pitch-750) / 1);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: rgba(var(--pitch-600) / 1);
 }
 
 /* Reduced motion preference */

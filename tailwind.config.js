@@ -4,17 +4,18 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'media',
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         pitch: {
-          950: '#06090F',
-          900: '#0B101B',
-          850: '#101726',
-          800: '#172033',
-          700: '#222E47',
-          600: '#334466',
+          950: 'rgb(var(--pitch-950) / <alpha-value>)',
+          900: 'rgb(var(--pitch-900) / <alpha-value>)',
+          850: 'rgb(var(--pitch-850) / <alpha-value>)',
+          800: 'rgb(var(--pitch-800) / <alpha-value>)',
+          750: 'rgb(var(--pitch-750) / <alpha-value>)',
+          700: 'rgb(var(--pitch-700) / <alpha-value>)',
+          600: 'rgb(var(--pitch-600) / <alpha-value>)',
         },
         coral: {
           400: '#FF5C77',

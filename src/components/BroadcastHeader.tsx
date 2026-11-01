@@ -1,12 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Shield, TrendingUp, Sparkles, UserCheck, EyeOff } from 'lucide-react';
+import { Flame, Shield, TrendingUp, Sparkles, UserCheck, EyeOff, Sun, Moon } from 'lucide-react';
 import { useMatchStore } from '../store/useMatchStore';
 import { useCatchUpStore } from '../store/useCatchUpStore';
+import { useThemeStore } from '../store/useThemeStore';
 
 export const BroadcastHeader: React.FC = () => {
   const match = useMatchStore((state) => state.match);
   const { isAway, simulateStepAway, openCatchUpSheet } = useCatchUpStore();
+  const { isDark, toggleTheme } = useThemeStore();
 
   const ballsRemaining = Math.max(0, 120 - match.ballsBowled);
   const runsNeeded = Math.max(0, match.target - match.runs);
@@ -63,6 +65,26 @@ export const BroadcastHeader: React.FC = () => {
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Catch-Up Lens</span>
+          </button>
+
+          {/* Light / Dark Mode Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="p-1 sm:px-2.5 sm:py-1 rounded bg-pitch-800 hover:bg-pitch-700 text-slate-300 hover:text-white border border-pitch-700 transition flex items-center space-x-1.5 shadow-sm active:scale-95"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDark ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline font-medium text-xs">Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-indigo-500" />
+                <span className="hidden sm:inline font-medium text-xs">Dark</span>
+              </>
+            )}
           </button>
         </div>
       </div>
