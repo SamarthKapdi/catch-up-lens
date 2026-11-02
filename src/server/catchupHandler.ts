@@ -89,8 +89,9 @@ CRITICAL RULES:
           { role: 'user', content: userPayload },
         ],
         response_format: { type: 'json_object' },
+        reasoning_effort: 'low',
         temperature: 0.6,
-        max_tokens: 800,
+        max_tokens: 1200,
       }),
       signal: controller.signal,
     });
