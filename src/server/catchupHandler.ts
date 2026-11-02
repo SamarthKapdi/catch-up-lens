@@ -98,7 +98,8 @@ CRITICAL RULES:
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.warn(`Groq API returned HTTP error ${response.status}. Using fallback.`);
+      const errorBody = await response.text();
+      console.warn(`Groq API returned HTTP error ${response.status}. Using fallback.`, errorBody);
       return generateDeterministicSummary(body);
     }
 
