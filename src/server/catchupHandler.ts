@@ -1,5 +1,5 @@
-import { generateDeterministicSummary, trimToMaxWords } from '../engine/fallbackSummarizer';
-import { BallEvent, CatchUpSummary, SummaryTone } from '../engine/types';
+import { generateDeterministicSummary, trimToMaxWords } from '../engine/fallbackSummarizer.js';
+import { BallEvent, CatchUpSummary, SummaryTone } from '../engine/types.js';
 
 export interface CatchUpRequestBody {
   missedEvents: BallEvent[];

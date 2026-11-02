@@ -1,4 +1,4 @@
-import { processCatchUpRequest, CatchUpRequestBody } from '../src/server/catchupHandler';
+import { processCatchUpRequest, CatchUpRequestBody } from '../src/server/catchupHandler.js';
 
 interface MinimalVercelReq {
   method?: string;
