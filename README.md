@@ -116,8 +116,8 @@ The fallback summarizer uses the same match data to produce tone-aware summaries
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/SamarthKapdi/matchday-catchup-lens.git
-cd matchday-catchup-lens
+git clone https://github.com/SamarthKapdi/catch-up-lens.git
+cd catch-up-lens
 
 # 2. Install dependencies
 npm install
