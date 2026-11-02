@@ -99,7 +99,7 @@ CRITICAL RULES:
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorBody = await response.text();
+      const errorBody = typeof response.text === 'function' ? await response.text() : 'No response body';
       console.warn(`Groq API returned HTTP error ${response.status}. Using fallback.`, errorBody);
       return generateDeterministicSummary(body);
     }
