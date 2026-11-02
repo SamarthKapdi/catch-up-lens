@@ -109,7 +109,7 @@ export interface CatchUpSummary {
   happened: string; // strictly <= 45 words
   whyItMatters: string;
   watchNext: string;
-  source: 'ai' | 'instant';
+  source: 'groq' | 'instant';
   tone: SummaryTone;
   missedBallsCount: number;
   missedRuns: number;

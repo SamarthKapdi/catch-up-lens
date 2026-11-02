@@ -79,7 +79,7 @@ CRITICAL RULES:
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: 'Bearer ' + apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -130,7 +130,7 @@ CRITICAL RULES:
         happened: trimToMaxWords(parsed.happened.trim(), 45),
         whyItMatters: parsed.whyItMatters.trim(),
         watchNext: parsed.watchNext.trim(),
-        source: 'ai',
+        source: 'groq',
         tone: body.tone,
         missedBallsCount: ballsMissed,
         missedRuns: runsMissed,

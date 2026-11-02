@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer-core');
 
-const SCREENSHOTS_DIR = 'C:\\Users\\Acer\\.gemini\\antigravity\\brain\\5888e3db-8955-496e-8991-df096f749aac\\screenshots';
+const SCREENSHOTS_DIR = path.join(__dirname, '..', 'screenshots');
+fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
 
 async function verifyTheme() {
   const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';

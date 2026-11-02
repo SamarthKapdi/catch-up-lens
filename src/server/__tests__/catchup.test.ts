@@ -123,7 +123,7 @@ describe('CatchUp Server Handler & Groq Fallback Engine', () => {
 
     const summary = await processCatchUpRequest(defaultBody, 'mock-groq-key');
 
-    expect(summary.source).toBe('ai');
+    expect(summary.source).toBe('groq');
     expect(summary.headline).toBe('Mercer Strikes: Drake Bowled After Boundary!');
     expect(summary.happened).toContain('Drake smashed a crisp four');
     expect(countWords(summary.happened)).toBeLessThanOrEqual(45);
@@ -152,7 +152,7 @@ describe('CatchUp Server Handler & Groq Fallback Engine', () => {
     });
 
     const summary = await processCatchUpRequest(defaultBody, 'mock-groq-key');
-    expect(summary.source).toBe('ai');
+    expect(summary.source).toBe('groq');
     expect(summary.headline).toBe('Code Fence Headline');
   });
 
